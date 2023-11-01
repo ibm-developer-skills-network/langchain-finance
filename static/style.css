@@ -3,13 +3,13 @@
 }
 
 .chat-container {
-    max-width: 400px;
+    max-width: 500px;
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    background-color: #f9f9f9;
+    background-color: #53004d;
 }
 
 .chat-messages {
@@ -26,7 +26,7 @@
 }
 
 .bot-message {
-    background-color: #4CAF50;
+    background-color: #2196F3;
     color: white;
     padding: 8px 12px;
     border-radius: 5px;
@@ -34,12 +34,12 @@
 }
 
 .initial-message {
-    background-color: #007bff;
+    text-align: center;
+    background-color: #53004d;
 }
 
-/* Style user messages (if needed) */
 .user-message {
-    background-color: #2196F3;
+    background-color: #270089;
     color: white;
     padding: 8px 12px;
     border-radius: 5px;
