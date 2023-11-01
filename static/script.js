@@ -16,9 +16,11 @@ $(document).ready(function() {
             data: JSON.stringify({ userMessage: selectedTicker }),
             success: function(response) {
                 var botResponse = response.botResponse;
-                // Replace the last bot message with the bot's response
-                $("#chatMessages .bot-message").last().text(botResponse);
-            },
+                // Convert newline characters to <br> elements for proper display
+                var formattedResponse = botResponse.replace(/\n/g, '<br>');
+                // Replace the last bot message with the bot's response using .html() instead of .text()
+                $("#chatMessages .bot-message").last().html(formattedResponse);
+            },            
             error: function(error) {
                 console.error(error);
                 appendBotMessage("Error processing request.");
