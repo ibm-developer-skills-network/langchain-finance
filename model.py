@@ -11,8 +11,8 @@ from ibm_watson_machine_learning.foundation_models import Model
 # Check for GPU availability and set the appropriate device for computation.
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-Watsonx_API = "Watsonx_API"
-Project_id= "Project_id"
+Watsonx_API = "YOUR_WATSONX_API"
+Project_id= "YOUR_PROJECT_ID"
 
 # Function to initialize the language model 
 def init_llm():
