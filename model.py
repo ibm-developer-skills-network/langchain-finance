@@ -11,21 +11,15 @@ from ibm_watson_machine_learning.foundation_models import Model
 # Check for GPU availability and set the appropriate device for computation.
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-# Global variables
-llm_hub = None
-embeddings = None
-
-# Replace 'Watsonx_API' and 'Project_id' with your actual API key and Project ID
 Watsonx_API = "Watsonx_API"
 Project_id= "Project_id"
-    
 
-# Function to initialize the Watsonx language model and its embeddings used to represent text data in a form (vectors) that machines can understand. 
+# Function to initialize the language model 
 def init_llm():
-    global llm_hub, embeddings
+    global llm, model
     
     params = {
-        GenParams.MAX_NEW_TOKENS: 250, # The maximum number of tokens that the model can generate in a single run.
+        GenParams.MAX_NEW_TOKENS: 1024, # The maximum number of tokens that the model can generate in a single run.
         GenParams.MIN_NEW_TOKENS: 1,   # The minimum number of tokens that the model should generate in a single run.
         GenParams.DECODING_METHOD: DecodingMethods.SAMPLE, # The method used by the model for decoding/generating new tokens. In this case, it uses the sampling method.
         GenParams.TEMPERATURE: 0.6,   # A parameter that controls the randomness of the token generation. A lower value makes the generation more deterministic, while a higher value introduces more randomness.
@@ -38,18 +32,14 @@ def init_llm():
         'apikey' : Watsonx_API
     }
 
+    model_id = ModelTypes.LLAMA_2_70B_CHAT
     
     model = Model(
-        model_id= 'meta-llama/llama-2-70b-chat',
+        model_id= model_id,
         credentials=credentials,
         params=params,
         project_id=Project_id)
 
-    llm_hub = WatsonxLLM(model=model)
-
-    # Initialize embeddings using a pre-trained model to represent the text data.
-    embeddings = HuggingFaceInstructEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={"device": DEVICE}
-    )
+    llm = WatsonxLLM(model=model)
 
 init_llm()
