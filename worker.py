@@ -3,21 +3,21 @@ from ibm_watson_machine_learning.foundation_models.extensions.langchain import W
 from ibm_watson_machine_learning.foundation_models.utils.enums import ModelTypes, DecodingMethods
 from ibm_watson_machine_learning.metanames import GenTextParamsMetaNames as GenParams
 from ibm_watson_machine_learning.foundation_models import Model
+import yfinance as yf
+import os
+from langchain.document_loaders.web_base import WebBaseLoader
+from langchain.utilities import GoogleSerperAPIWrapper
 from langchain_experimental.plan_and_execute import PlanAndExecute, load_agent_executor, load_chat_planner
 from langchain.agents.tools import Tool
-from langchain.utilities import GoogleSerperAPIWrapper
 from langchain import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.agents import ZeroShotAgent, Tool, AgentExecutor
 
-# Check for GPU availability and set the appropriate device for computation.
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 Watsonx_API = "Watsonx_API"
 Project_id= "Project_id"
 
-
-# Function to initialize the language model 
 def init_llm():
     global llm, model
     
@@ -47,11 +47,7 @@ def init_llm():
 
 init_llm()
 
-import yfinance as yf
-from langchain.document_loaders.web_base import WebBaseLoader
-from langchain.utilities import GoogleSerperAPIWrapper
-import os
-os.environ["SERPER_API_KEY"] = "1ef17f8406cf79694e139c5592ee2c14d779e10e"
+os.environ["SERPER_API_KEY"] = "SERPER_API_KEY"
 
 def get_ticker_news(ticker, n_search_results=3):
     # Get the news from Yahoo Finance
@@ -63,9 +59,8 @@ def get_ticker_news(ticker, n_search_results=3):
     except: 
         print(f"No news found from Yahoo Finance.")
     
-    # Get the news from Google News
     print(yf.Ticker(ticker).info['longName'])
-    company = yf.Ticker(ticker).info['longName'] # Get the company's full name
+    company = yf.Ticker(ticker).info['longName'] 
     search = GoogleSerperAPIWrapper(type="news", tbs="qdr:d5", serper_api_key=os.environ["SERPER_API_KEY"])
     results = search.results(f"financial news about {company} or {ticker}")
     if not results['news']:
@@ -107,17 +102,11 @@ def get_financial_statements(ticker):
     cash_flow = company.cash_flow
     income_statement = company.income_stmt
     
-    # Set up the file name
     csv_file_prefix = f"{ticker}_financial_"
-    
-    # Get the stock price data
     stock_data = yf.download(ticker, period='5y', interval='1d')
-    
-    # Save the stock price data to the CSV file
     data_csv_filename = csv_file_prefix + "stock_data.csv"
     stock_data.to_csv(data_csv_filename)
     
-    # Save the financial statements data to the CSV file
     balance_sheet_csv_filename = csv_file_prefix + "balance_sheet.csv"
     cash_flow_csv_filename = csv_file_prefix + "cash_flow.csv"
     income_statement_csv_filename = csv_file_prefix + "income_statement.csv"
@@ -130,7 +119,6 @@ def get_financial_statements(ticker):
     print('Stock price data and financial statements are saved to the CSV files')
     return data_csv_filename, balance_sheet_csv_filename, cash_flow_csv_filename, income_statement_csv_filename
 
-# Make a tool list
 tools = [  
     Tool(
         name="Get Recent News",
@@ -144,7 +132,6 @@ tools = [
     ),
 ]
 
-# Run the agent with a query
 template = """
 <s>[INST] <<SYS>>
 As a stock investment advisor, your role is to provide investment recommendations based on the company's current financial performance and market trends.
@@ -182,7 +169,6 @@ tool_names = [tool.name for tool in tools]
 agent = ZeroShotAgent(llm_chain=llm_chain, allowed_tools=tool_names)
 agent_executor = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=False, max_iterations = 2)
 
-# Define the function that interacts with the model
 def process_prompt(ticker):
     try:
         ticker = ticker.upper()
